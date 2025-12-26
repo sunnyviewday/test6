@@ -143,6 +143,22 @@
     .qr-code {
       width: 260px;
       height: 260px;
+      display: block;
+    }
+
+    .qr-code.hidden {
+      display: none;
+    }
+
+    .validation-video {
+      width: 260px;
+      height: 260px;
+      display: none;
+      border-radius: 8px;
+    }
+
+    .validation-video.active {
+      display: block;
     }
 
     .check-validity-btn {
@@ -233,48 +249,6 @@
       0% { box-shadow: 0 0 0 0 rgba(0, 145, 179, 0.7); }
       100% { box-shadow: 0 0 0 15px rgba(0, 145, 179, 0); }
     }
-
-    /* Video overlay */
-    .video-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.9);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .video-overlay.active {
-      display: flex;
-    }
-
-    .video-container {
-      position: relative;
-      width: 90%;
-      max-width: 400px;
-    }
-
-    .video-container video {
-      width: 100%;
-      border-radius: 12px;
-    }
-
-    .close-video-btn {
-      position: absolute;
-      top: -40px;
-      right: 0;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 36px;
-      cursor: pointer;
-      padding: 0;
-      line-height: 1;
-    }
   </style>
 </head>
 <body>
@@ -356,6 +330,12 @@
         <g id="qrData"></g>
       </svg>
 
+      <!-- Video element (hidden by default) -->
+      <video class="validation-video" id="validationVideo">
+        <source src="RPReplay_Final1764226940 4.mov" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+
       <button class="check-validity-btn" id="checkValidityBtn">Check validity</button>
     </div>
 
@@ -407,17 +387,6 @@
     <!-- Home indicator -->
     <div class="home-indicator">
       <div class="home-indicator-bar"></div>
-    </div>
-  </div>
-
-  <!-- Video Overlay -->
-  <div class="video-overlay" id="videoOverlay">
-    <div class="video-container">
-      <button class="close-video-btn" id="closeVideoBtn">×</button>
-      <video id="validationVideo" controls>
-        <source src="RPReplay_Final1764226940 4.mov" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
     </div>
   </div>
 
@@ -525,31 +494,23 @@
       this.classList.add('pulse');
       setTimeout(() => this.classList.remove('pulse'), 300);
       
-      // Show video overlay and play video
-      const videoOverlay = document.getElementById('videoOverlay');
+      // Hide QR code and show video
+      const qrCode = document.getElementById('qrCode');
       const video = document.getElementById('validationVideo');
       
-      videoOverlay.classList.add('active');
+      qrCode.classList.add('hidden');
+      video.classList.add('active');
       video.currentTime = 0; // Start from beginning
       video.play();
     });
 
-    // Close video overlay
-    document.getElementById('closeVideoBtn').addEventListener('click', function() {
-      const videoOverlay = document.getElementById('videoOverlay');
+    // When video ends, show QR code again
+    document.getElementById('validationVideo').addEventListener('ended', function() {
+      const qrCode = document.getElementById('qrCode');
       const video = document.getElementById('validationVideo');
       
-      video.pause();
-      videoOverlay.classList.remove('active');
-    });
-
-    // Close video when clicking outside
-    document.getElementById('videoOverlay').addEventListener('click', function(e) {
-      if (e.target === this) {
-        const video = document.getElementById('validationVideo');
-        video.pause();
-        this.classList.remove('active');
-      }
+      video.classList.remove('active');
+      qrCode.classList.remove('hidden');
     });
 
     // Initialize
