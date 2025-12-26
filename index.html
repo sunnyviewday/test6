@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mobilcard - Active Journey</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #006B1F;
+      min-height: 100vh;
+      max-width: 430px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Empty status bar */
+    .status-bar {
+      background-color: #F8F8F8;
+      padding: 14px 28px 10px;
+      height: 44px;
+    }
+
+    /* Scrollable content */
+    .content {
+      height: calc(100vh - 44px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Header */
+    .header {
+      padding: 20px 24px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .header h1 {
+      color: white;
+      font-size: 25px;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.3px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 32px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 0.8;
+      font-weight: 300;
+    }
+
+    /* Cards */
+    .card {
+      background-color: white;
+      border-radius: 14px;
+      margin: 0 20px 14px;
+    }
+
+    /* Ticket Card */
+    .ticket-card {
+      padding: 22px 26px 26px;
+    }
+
+    .mobilcard-logo {
+      width: 85px;
+      height: 55px;
+    }
+
+    .ticket-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 14px 0 20px;
+      color: #000;
+      letter-spacing: -0.5px;
+    }
+
+    .label {
+      color: #8E8E93;
+      font-size: 15px;
+      margin: 0 0 4px;
+      font-weight: 400;
+    }
+
+    .value {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 18px;
+      color: #000;
+      letter-spacing: -0.3px;
+    }
+
+    .divider {
+      border-top: 1px solid #E5E5EA;
+      padding-top: 22px;
+    }
+
+    .journey-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background-color: #4A5568;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+
+    .journey-icon span {
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .route {
+      font-size: 24px;
+      font-weight: 700;
+      color: #000;
+      line-height: 1.25;
+      letter-spacing: -0.3px;
+    }
+
+    /* QR Card */
+    .qr-card {
+      padding: 28px 24px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .qr-code {
+      width: 260px;
+      height: 260px;
+    }
+
+    .check-validity-btn {
+      background-color: #0091B3;
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 13px 28px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-top: 26px;
+      cursor: pointer;
+      letter-spacing: -0.2px;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+
+    .check-validity-btn:active {
+      transform: scale(0.97);
+      background-color: #007A99;
+    }
+
+    /* Animation Card */
+    .animation-card {
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .animation-header {
+      padding: 26px 24px 0;
+      text-align: center;
+    }
+
+    .animation-header h3 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #000;
+      letter-spacing: -0.3px;
+    }
+
+    .mountain-scene {
+      width: 100%;
+      height: 280px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Cable car animation */
+    .cable-car-group {
+      position: absolute;
+      transition: none;
+    }
+
+    .cable-car-group.animating {
+      animation: moveCableCar 8s linear infinite;
+    }
+
+    @keyframes moveCableCar {
+      0% {
+        left: -60px;
+        top: 200px;
+      }
+      100% {
+        left: 380px;
+        top: 60px;
+      }
+    }
+
+    /* Home indicator */
+    .home-indicator {
+      display: flex;
+      justify-content: center;
+      padding-bottom: 10px;
+    }
+
+    .home-indicator-bar {
+      width: 134px;
+      height: 5px;
+      background-color: rgba(255, 255, 255, 0.25);
+      border-radius: 2.5px;
+    }
+
+    /* Animation pulse effect on button */
+    .check-validity-btn.pulse {
+      animation: pulse 0.3s ease-out;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 145, 179, 0.7); }
+      100% { box-shadow: 0 0 0 15px rgba(0, 145, 179, 0); }
+    }
+
+    /* Video overlay */
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .video-overlay.active {
+      display: flex;
+    }
+
+    .video-container {
+      position: relative;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .video-container video {
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    .close-video-btn {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 36px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- Empty Status Bar -->
+  <div class="status-bar"></div>
+
+  <!-- Scrollable Content -->
+  <div class="content">
+    <!-- Header -->
+    <div class="header">
+      <h1>Active journey <span id="countdown">21:39</span></h1>
+      <button class="close-btn">×</button>
+    </div>
+
+    <!-- Ticket Card -->
+    <div class="card ticket-card">
+      <svg class="mobilcard-logo" viewBox="0 0 85 55">
+        <rect x="0" y="5" width="48" height="42" rx="6" fill="#8B1538"/>
+        <text x="9" y="36" fill="white" font-family="Arial, sans-serif" font-weight="bold" font-size="28">M</text>
+        <circle cx="56" cy="14" r="6" fill="#8B1538"/>
+        <circle cx="72" cy="14" r="6" fill="#8B1538"/>
+        <circle cx="56" cy="30" r="6" fill="#8B1538"/>
+        <circle cx="72" cy="30" r="6" fill="#D4B5B5"/>
+        <circle cx="56" cy="46" r="6" fill="#D4B5B5"/>
+        <circle cx="72" cy="46" r="6" fill="#8B1538"/>
+      </svg>
+
+      <h2 class="ticket-title">Mobilcard 1 day</h2>
+
+      <p class="label">Validated</p>
+      <p class="value">27.11.2025, 07:41</p>
+
+      <p class="label">Ticket holder</p>
+      <p class="value" style="margin-bottom: 22px;">Vadym Yeremiichuk</p>
+
+      <div class="divider">
+        <p class="label" style="margin-bottom: 10px;">Journey planner</p>
+        <div class="journey-icon">
+          <span>R</span>
+        </div>
+        <p class="route">Bahnhof Sterzing - Pfitsch – Bahnhof Meran</p>
+      </div>
+    </div>
+
+    <!-- QR Code Card -->
+    <div class="card qr-card">
+      <svg class="qr-code" viewBox="0 0 260 260" id="qrCode">
+        <rect width="260" height="260" fill="white"/>
+        <!-- Top-left position detection pattern -->
+        <rect x="8" y="8" width="56" height="56" fill="black"/>
+        <rect x="16" y="16" width="40" height="40" fill="white"/>
+        <rect x="24" y="24" width="24" height="24" fill="black"/>
+        <!-- Top-right position detection pattern -->
+        <rect x="196" y="8" width="56" height="56" fill="black"/>
+        <rect x="204" y="16" width="40" height="40" fill="white"/>
+        <rect x="212" y="24" width="24" height="24" fill="black"/>
+        <!-- Bottom-left position detection pattern -->
+        <rect x="8" y="196" width="56" height="56" fill="black"/>
+        <rect x="16" y="204" width="40" height="40" fill="white"/>
+        <rect x="24" y="212" width="24" height="24" fill="black"/>
+        <!-- Timing patterns -->
+        <rect x="48" y="72" width="8" height="8" fill="black"/>
+        <rect x="48" y="88" width="8" height="8" fill="black"/>
+        <rect x="48" y="104" width="8" height="8" fill="black"/>
+        <rect x="48" y="120" width="8" height="8" fill="black"/>
+        <rect x="48" y="136" width="8" height="8" fill="black"/>
+        <rect x="48" y="152" width="8" height="8" fill="black"/>
+        <rect x="48" y="168" width="8" height="8" fill="black"/>
+        <rect x="48" y="184" width="8" height="8" fill="black"/>
+        <rect x="72" y="48" width="8" height="8" fill="black"/>
+        <rect x="88" y="48" width="8" height="8" fill="black"/>
+        <rect x="104" y="48" width="8" height="8" fill="black"/>
+        <rect x="120" y="48" width="8" height="8" fill="black"/>
+        <rect x="136" y="48" width="8" height="8" fill="black"/>
+        <rect x="152" y="48" width="8" height="8" fill="black"/>
+        <rect x="168" y="48" width="8" height="8" fill="black"/>
+        <rect x="184" y="48" width="8" height="8" fill="black"/>
+        <!-- Data modules - pseudo random pattern -->
+        <g id="qrData"></g>
+      </svg>
+
+      <button class="check-validity-btn" id="checkValidityBtn">Check validity</button>
+    </div>
+
+    <!-- Animation Card -->
+    <div class="card animation-card">
+      <div class="animation-header">
+        <h3>Have a safe trip!</h3>
+      </div>
+      <svg class="mountain-scene" viewBox="0 0 340 280" preserveAspectRatio="xMidYMax slice">
+        <!-- White background -->
+        <rect width="340" height="280" fill="white"/>
+        
+        <!-- Background light blue shapes -->
+        <polygon points="-20,140 80,220 -20,280" fill="#D6EBF2"/>
+        <polygon points="280,80 360,160 360,280 220,280" fill="#D6EBF2"/>
+        
+        <!-- Cable line - diagonal from bottom-left to top-right -->
+        <line x1="-40" y1="240" x2="380" y2="60" stroke="#3D4852" stroke-width="2.5"/>
+        
+        <!-- Mountains - layered -->
+        <!-- Left mountain -->
+        <polygon points="-30,280 70,140 170,280" fill="#4DA6BD"/>
+        <!-- Center mountain (tallest) -->
+        <polygon points="80,280 180,100 280,280" fill="#3A8A9E"/>
+        <!-- Right mountain -->
+        <polygon points="180,280 290,150 400,280" fill="#4DA6BD"/>
+        
+        <!-- Snow caps / lighter tops -->
+        <polygon points="70,140 50,180 90,180" fill="#8ECADB"/>
+        <polygon points="180,100 155,150 205,150" fill="#8ECADB"/>
+        <polygon points="290,150 265,195 315,195" fill="#8ECADB"/>
+        
+        <!-- Cable car group - will be animated -->
+        <g id="cableCar" class="cable-car-group" style="left: 120px; top: 165px;">
+          <!-- Hanger connection to cable -->
+          <polygon points="22,-25 28,-25 25,-35" fill="#3D4852" stroke="#3D4852" stroke-width="1"/>
+          <!-- Vertical hanger arm -->
+          <line x1="25" y1="-25" x2="25" y2="0" stroke="#3D4852" stroke-width="3"/>
+          <!-- Cable car body -->
+          <rect x="0" y="0" width="50" height="35" rx="3" fill="white" stroke="#3D4852" stroke-width="2.5"/>
+          <!-- Windows -->
+          <rect x="5" y="5" width="12" height="20" rx="2" fill="white" stroke="#3D4852" stroke-width="1.5"/>
+          <rect x="19" y="5" width="12" height="20" rx="2" fill="white" stroke="#3D4852" stroke-width="1.5"/>
+          <rect x="33" y="5" width="12" height="20" rx="2" fill="white" stroke="#3D4852" stroke-width="1.5"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Home indicator -->
+    <div class="home-indicator">
+      <div class="home-indicator-bar"></div>
+    </div>
+  </div>
+
+  <!-- Video Overlay -->
+  <div class="video-overlay" id="videoOverlay">
+    <div class="video-container">
+      <button class="close-video-btn" id="closeVideoBtn">×</button>
+      <video id="validationVideo" controls>
+        <source src="RPReplay_Final1764226940 4.mov" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+
+  <script>
+    // Generate QR code data pattern
+    function generateQRPattern() {
+      const qrData = document.getElementById('qrData');
+      const seed = 12345;
+      let s = seed;
+      
+      for (let row = 0; row < 33; row++) {
+        for (let col = 0; col < 33; col++) {
+          // Skip corner position detection patterns
+          const isTopLeft = row < 9 && col < 9;
+          const isTopRight = row < 9 && col > 23;
+          const isBottomLeft = row > 23 && col < 9;
+          const isTimingV = col === 6 && row > 8 && row < 24;
+          const isTimingH = row === 6 && col > 8 && col < 24;
+          
+          if (isTopLeft || isTopRight || isBottomLeft || isTimingV || isTimingH) continue;
+          
+          s = (s * 1103515245 + 12345) & 0x7fffffff;
+          if ((s % 100) < 48) {
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', 8 + col * 7.4);
+            rect.setAttribute('y', 8 + row * 7.4);
+            rect.setAttribute('width', 6.5);
+            rect.setAttribute('height', 6.5);
+            rect.setAttribute('fill', 'black');
+            qrData.appendChild(rect);
+          }
+        }
+      }
+    }
+
+    // Cable car animation
+    let animationRunning = false;
+    let animationId = null;
+    let cableCarX = 120;
+    
+    function animateCableCar() {
+      const cableCar = document.getElementById('cableCar');
+      
+      // Cable line goes from (-40, 240) to (380, 60)
+      // Calculate Y based on X position along the line
+      // slope = (60 - 240) / (380 - (-40)) = -180 / 420 = -0.4286
+      const slope = -180 / 420;
+      const yIntercept = 240 - slope * (-40); // y = mx + b, solve for b
+      
+      function updatePosition() {
+        if (!animationRunning) return;
+        
+        cableCarX += 0.8;
+        if (cableCarX > 350) {
+          cableCarX = -60;
+        }
+        
+        const y = slope * cableCarX + yIntercept;
+        cableCar.setAttribute('transform', `translate(${cableCarX}, ${y - 35})`);
+        
+        animationId = requestAnimationFrame(updatePosition);
+      }
+      
+      updatePosition();
+    }
+
+    function startAnimation() {
+      if (!animationRunning) {
+        animationRunning = true;
+        animateCableCar();
+      }
+    }
+
+    function stopAnimation() {
+      animationRunning = false;
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    }
+
+    // Countdown timer
+    let hours = 21;
+    let minutes = 39;
+
+    function updateCountdown() {
+      const countdownEl = document.getElementById('countdown');
+      const h = hours.toString().padStart(2, '0');
+      const m = minutes.toString().padStart(2, '0');
+      countdownEl.textContent = `${h}:${m}`;
+    }
+
+    setInterval(() => {
+      if (minutes === 0) {
+        if (hours === 0) return;
+        hours--;
+        minutes = 59;
+      } else {
+        minutes--;
+      }
+      updateCountdown();
+    }, 60000);
+
+    // Check validity button handler
+    document.getElementById('checkValidityBtn').addEventListener('click', function() {
+      this.classList.add('pulse');
+      setTimeout(() => this.classList.remove('pulse'), 300);
+      
+      // Show video overlay and play video
+      const videoOverlay = document.getElementById('videoOverlay');
+      const video = document.getElementById('validationVideo');
+      
+      videoOverlay.classList.add('active');
+      video.currentTime = 0; // Start from beginning
+      video.play();
+    });
+
+    // Close video overlay
+    document.getElementById('closeVideoBtn').addEventListener('click', function() {
+      const videoOverlay = document.getElementById('videoOverlay');
+      const video = document.getElementById('validationVideo');
+      
+      video.pause();
+      videoOverlay.classList.remove('active');
+    });
+
+    // Close video when clicking outside
+    document.getElementById('videoOverlay').addEventListener('click', function(e) {
+      if (e.target === this) {
+        const video = document.getElementById('validationVideo');
+        video.pause();
+        this.classList.remove('active');
+      }
+    });
+
+    // Initialize
+    generateQRPattern();
+    
+    // Set initial cable car position
+    const cableCar = document.getElementById('cableCar');
+    const slope = -180 / 420;
+    const yIntercept = 240 - slope * (-40);
+    const initialY = slope * cableCarX + yIntercept;
+    cableCar.setAttribute('transform', `translate(${cableCarX}, ${initialY - 35})`);
+  </script>
+</body>
+</html>
